@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "lib": [
+      "es6",
+      "es5"
+    ],
+    "noImplicitAny": true,
+    "declaration": true,
+    "strict": true,
+    "pretty": true,
+    "noUnusedLocals": true
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*"
+  ]
+}
