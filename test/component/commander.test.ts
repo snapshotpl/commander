@@ -62,7 +62,7 @@ describe("Commander with middlewares combo", () => {
     it("should write info logs", async () => {
         await commander.handle(new HelloCommand('John', 'Doe'));
 
-        const infos = logger.messages.filter(entry => entry.level === 'info');
+        const infos = logger.Messages.filter(entry => entry.level === 'info');
 
         expect(infos.length).to.be.greaterThan(0);
     });
@@ -78,7 +78,7 @@ describe("Commander with middlewares combo", () => {
             await commander.handle(new HelloCommand('John', ''));
         } catch (err) { }
 
-        const errors = logger.messages.filter(entry => entry.level === 'error');
+        const errors = logger.Messages.filter(entry => entry.level === 'error');
 
         expect(errors.length).to.be.greaterThan(0);
     });

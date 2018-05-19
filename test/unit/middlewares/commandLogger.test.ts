@@ -33,8 +33,8 @@ describe("Command Logger Middleware", () => {
 
         await commandLogger.run(new TestCommand(), next);
 
-        const infos = logger.messages.filter((entry) => entry.level === 'info');
-        const errors = logger.messages.filter((entry) => entry.level === 'errors');
+        const infos = logger.Messages.filter((entry) => entry.level === 'info');
+        const errors = logger.Messages.filter((entry) => entry.level === 'errors');
 
         expect(infos.length).to.be.equal(2);
         expect(errors.length).to.be.equal(0);
@@ -75,8 +75,8 @@ describe("Command Logger Middleware", () => {
             await commandLogger.run(new TestCommand(), next);
         } catch (e) { }
 
-        const infos = logger.messages.filter((entry) => entry.level === 'info');
-        const errors = logger.messages.filter((entry) => entry.level === 'error');
+        const infos = logger.Messages.filter((entry) => entry.level === 'info');
+        const errors = logger.Messages.filter((entry) => entry.level === 'error');
 
         expect(infos.length).to.be.equal(2);
         expect(errors.length).to.be.equal(1);

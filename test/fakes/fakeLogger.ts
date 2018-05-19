@@ -5,7 +5,11 @@ import { CommandLogger } from '../../src/middlewares';
 
 export class FakeLogger implements CommandLogger {
 
-    public messages: { level: string, msg: string, meta: any }[] = [];
+    private messages: { level: string, msg: string, meta: any }[] = [];
+
+    public get Messages() {
+        return this.messages;
+    }
 
     public log(level: string, msg: string, ...meta: any[]): CommandLogger {
         const placeholders: string[] = msg.match(/%[sdifjoO]/g) || [];
