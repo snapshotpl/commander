@@ -8,10 +8,9 @@ export class CommandExecutionMiddleware implements Middleware {
         private handlerResolver: HandlerResolver
     ) { }
 
-    public async run(command: Command, next: NextMiddleware): Promise<any> {
+    public async run(command: Command, next: NextMiddleware): Promise<void> {
         const handler: Handler<Command> = this.handlerResolver.resolve(command);
-        const result = await handler.handle(command);
+        await handler.handle(command);
         await next();
-        return result;
     }
 }

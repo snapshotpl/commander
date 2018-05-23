@@ -12,13 +12,13 @@ describe("In Memory Handle Resolver", () => {
     class TestCommandWithNoHandler implements Command { }
 
     class FooHandler implements Handler<FooCommand> {
-        handle(c: FooCommand): Promise<any> {
+        handle(c: FooCommand): Promise<void> {
             return Promise.resolve();
         }
     }
 
     class BarHandler implements Handler<BarCommand> {
-        handle(c: FooCommand): Promise<any> {
+        handle(c: FooCommand): Promise<void> {
             return Promise.resolve();
         }
     }
@@ -39,7 +39,7 @@ describe("In Memory Handle Resolver", () => {
             .to.throw(Error);
     });
 
-    it("return resolve with registered handler", async () => {
+    it("resolve with registered handler", async () => {
         const givenHandler = new FooHandler();
         resolver.register(FooCommand, givenHandler);
         resolver.register(BarCommand, new BarHandler());

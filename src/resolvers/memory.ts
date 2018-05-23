@@ -21,12 +21,4 @@ export class HandlerResolverInMemory implements HandlerResolver {
 
         return handler;
     }
-
-    public count(): number {
-        return this.handlers.size;
-    }
-
-    public entries(): IterableIterator<[ConstructorOf<Command>, Handler<Command>]> {
-        return this.handlers.entries();
-    }
 }

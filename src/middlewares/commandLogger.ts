@@ -25,7 +25,7 @@ export class CommandLoggerMiddleware implements Middleware {
         this.errorLevel = options.errorLevel || 'error';
     }
 
-    public async run(command: Command, next: NextMiddleware): Promise<any> {
+    public async run(command: Command, next: NextMiddleware): Promise<void> {
         const start = Date.now();
         const commandName = command.constructor.name;
 

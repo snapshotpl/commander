@@ -11,8 +11,8 @@ export class Commander implements CommandBus {
         this.executionChain = this.createExecutionChain(middlewares);
     }
 
-    public async handle(command: Command): Promise<any> {
-        return await this.executionChain(command);
+    public async handle(command: Command): Promise<void> {
+        await this.executionChain(command);
     }
 
     private createExecutionChain(middlewares: Middleware[]): ExecutionChain {
@@ -25,7 +25,7 @@ export class Commander implements CommandBus {
             next: ExecutionChain,
             middleware: Middleware
         ): ExecutionChain => {
-            return (command: Command): Promise<any> => {
+            return (command: Command): Promise<void> => {
                 return middleware.run(command, () => next(command));
             }
         };

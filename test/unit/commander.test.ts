@@ -34,17 +34,7 @@ describe("Commander", () => {
         expect(result).to.be.undefined;
     });
 
-    it("should resolve with value from Middleware", async () => {
-        const commander = new Commander([
-            new CallbackMiddleware(async () => 'foo bar')
-        ]);
-
-        const result = await commander.handle(testCommand);
-
-        expect(result).to.be.equal('foo bar');
-    });
-
-    it("should launch all middlewares in order of middleware next() call", async () => {
+    it("should resolve after launching all middlewares in order of middleware next() call", async () => {
 
         const createPusher = (array: any[], item: any) => {
             return async (command: Command, next: NextMiddleware) => {
@@ -57,38 +47,15 @@ describe("Commander", () => {
         let counters: number[] = [];
 
         const commander = new Commander([
-            new CallbackMiddleware(createPusher(counters, 0)),
-            new CallbackMiddleware(createPusher(counters, 1)),
-            new CallbackMiddleware(createPusher(counters, 2)),
+            new CallbackMiddleware(createPusher(counters, 'first')),
+            new CallbackMiddleware(createPusher(counters, 'second')),
+            new CallbackMiddleware(createPusher(counters, 'third')),
         ]);
 
-        await commander.handle(testCommand);
+        const promise = commander.handle(testCommand);
 
-        expect(counters).to.deep.equal([2, 1, 0]);
+        expect(counters.length).to.be.equal(0);
+        await promise;
+        expect(counters).to.be.deep.equal(['third', 'second', 'first']);
     });
-
-    it("should resolve value from last middleware if all middlewares return next()", async () => {
-
-        const commander = new Commander([
-            new CallbackMiddleware((command: Command, next: NextMiddleware) => {
-                return next();
-            }),
-            new CallbackMiddleware((command: Command, next: NextMiddleware) => {
-                return next();
-            }),
-            new CallbackMiddleware((command: Command, next: NextMiddleware) => {
-                return next();
-            }),
-
-            new CallbackMiddleware(async (command: Command, next: NextMiddleware) => {
-                await next();
-                return 'foo bar';
-            }),
-        ]);
-
-        const result = await commander.handle(testCommand);
-
-        expect(result).to.be.equal('foo bar');
-    });
-
 });

@@ -14,38 +14,50 @@ import { FakeLogger } from '../fakes/fakeLogger';
 
 describe("Commander with middlewares combo", () => {
 
-    class HelloCommand implements Command {
+    type Person = {id: number, firstName: string, lastName: string};
+    type PersonRepository = Person[];
+
+    class AddPersonCommand implements Command {
         constructor(
             public firstName: string,
             public lastName: string
         ) { }
     }
 
-    class HelloHandler implements Handler<HelloCommand> {
-        public wait(timeout: number): Promise<void> {
-            return new Promise(resolve => setTimeout(resolve, timeout));
-        }
+    class AddPersonHandler implements Handler<AddPersonCommand> {
+        private lastId = 123;
 
-        public async handle(hello: HelloCommand): Promise<string> {
-            await this.wait(10); // simulate I/O waiting
+        constructor(
+            private repository: any[]
+        ) {}
 
-            if (hello.lastName.length === 0) {
-                throw new Error('lastName is empty string');
+        public async handle(addPerson: AddPersonCommand): Promise<void> {
+            if (
+                addPerson.firstName.length === 0 ||
+                addPerson.lastName.length === 0
+            ) {
+                throw new Error('firstName and lastName cannot be empty string');
             }
 
-            return `Hello, ${hello.firstName} ${hello.lastName}`;
+            this.repository.push({
+                id: ++ this.lastId,
+                firstName: addPerson.firstName,
+                lastName: addPerson.lastName,
+            });
         }
     }
 
     let logger: FakeLogger;
     let commander: Commander;
     let resolver: HandlerResolverInMemory;
+    let personRepository: PersonRepository;
 
     beforeEach(() => {
+        personRepository = [];
         logger = new FakeLogger();
         resolver = new HandlerResolverInMemory();
 
-        resolver.register(HelloCommand, new HelloHandler());
+        resolver.register(AddPersonCommand, new AddPersonHandler(personRepository));
 
         commander = new Commander([
             new CommandLoggerMiddleware(logger),
@@ -54,13 +66,17 @@ describe("Commander with middlewares combo", () => {
     });
 
     it("should resolve with value from handler", async () => {
-        const promise = commander.handle(new HelloCommand('John', 'Doe'));
+        await commander.handle(new AddPersonCommand('John', 'Doe'));
 
-        return expect(promise).to.eventually.be.equal('Hello, John Doe');
+        expect(personRepository).to.be.deep.equal([{
+            id: 124,
+            firstName: 'John',
+            lastName: 'Doe',
+        }]);
     });
 
     it("should write info logs", async () => {
-        await commander.handle(new HelloCommand('John', 'Doe'));
+        await commander.handle(new AddPersonCommand('John', 'Doe'));
 
         const infos = logger.Messages.filter(entry => entry.level === 'info');
 
@@ -68,14 +84,17 @@ describe("Commander with middlewares combo", () => {
     });
 
     it("should reject when handler rejects", async () => {
-        const promise = commander.handle(new HelloCommand('John', ''));
+        const promise = commander.handle(new AddPersonCommand('John', ''));
 
-        return expect(promise).to.eventually.be.rejectedWith(Error, 'lastName is empty string');
+        return expect(promise).to.eventually.be.rejectedWith(
+            Error,
+            'firstName and lastName cannot be empty string'
+        );
     });
 
     it("should write error logs when handler rejects", async () => {
         try {
-            await commander.handle(new HelloCommand('John', ''));
+            await commander.handle(new AddPersonCommand('John', ''));
         } catch (err) { }
 
         const errors = logger.Messages.filter(entry => entry.level === 'error');

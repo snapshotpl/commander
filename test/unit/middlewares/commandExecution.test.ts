@@ -13,15 +13,23 @@ describe("Command Execution Middleware", () => {
     const testCommand = new class implements Command { };
 
 
-    it("should return value from resolved handler", async () => {
+    it("should resolve after handler resolves", async () => {
+        const orderArr: string[] = [];
 
         const executor = new CommandExecutionMiddleware(
-            new FakeResolver(() => Promise.resolve('expected result'))
+            new FakeResolver(() => {
+                return Promise.resolve()
+                    .then(() => orderArr.push('resolver'))
+            })
         );
 
-        const result = await executor.run(testCommand, noop);
+        await executor.run(testCommand, noop)
+            .then(() => orderArr.push('after executor'));
 
-        expect(result).to.equal('expected result');
+        expect(orderArr).to.be.deep.equal([
+            'resolver',
+            'after executor'
+        ]);
     });
 
     it("should reject when handler rejects with the same reason", async () => {
@@ -38,7 +46,6 @@ describe("Command Execution Middleware", () => {
     });
 
     it("should resolve efter next() resolves", async () => {
-
         const executor = new CommandExecutionMiddleware(
             new FakeResolver(() => Promise.resolve())
         );
