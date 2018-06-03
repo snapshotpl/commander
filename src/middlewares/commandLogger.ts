@@ -14,6 +14,14 @@ export interface CommandLoggerOptions {
     errorLevel?: string;
 }
 
+class Timer {
+    private start = Date.now();
+
+    public getTime(): number {
+        return Date.now() - this.start;
+    }
+}
+
 export class CommandLoggerMiddleware implements Middleware {
     private logger: CommandLogger;
     private level: string;
@@ -26,19 +34,19 @@ export class CommandLoggerMiddleware implements Middleware {
     }
 
     public async run(command: Command, next: NextMiddleware): Promise<void> {
-        const start = Date.now();
         const commandName = command.constructor.name;
 
         this.logger.log(this.level, 'Command %s dispatched', commandName);
 
+        const timer = new Timer();
+
         try {
-            return await next();
+            const res = await next();
+            this.logger.log(this.level, 'Command %s succeeded (%dms)', commandName, timer.getTime());
+            return res;
         } catch (err) {
-            this.logger.log(this.errorLevel, 'Command %s error. %s', commandName, err);
+            this.logger.log(this.errorLevel, 'Command %s failed (%dms): %s', commandName, timer.getTime(), err);
             throw err;
-        } finally {
-            const time = Date.now() - start;
-            this.logger.log(this.level, 'Command %s time %dms', commandName, time);
         }
     }
 }

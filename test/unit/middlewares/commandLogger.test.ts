@@ -40,7 +40,7 @@ describe("Command Logger Middleware", () => {
         expect(errors.length).to.be.equal(0);
 
         expect(infos[0].msg).to.equal("Command TestCommand dispatched");
-        expect(infos[1].msg).to.equal("Command TestCommand time 25ms");
+        expect(infos[1].msg).to.equal("Command TestCommand succeeded (25ms)");
     });
 
     it("should resolve with same value as next()", async () => {
@@ -78,13 +78,11 @@ describe("Command Logger Middleware", () => {
         const infos = logger.Messages.filter((entry) => entry.level === 'info');
         const errors = logger.Messages.filter((entry) => entry.level === 'error');
 
-        expect(infos.length).to.be.equal(2);
+        expect(infos.length).to.be.equal(1);
         expect(errors.length).to.be.equal(1);
 
         expect(infos[0].msg).to.equal("Command TestCommand dispatched");
-        expect(infos[1].msg).to.equal("Command TestCommand time 125ms");
-
-        expect(errors[0].msg).to.equal("Command TestCommand error. Error: foo bar");
+        expect(errors[0].msg).to.equal("Command TestCommand failed (125ms): Error: foo bar");
     });
 
 });
