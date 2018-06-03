@@ -39,7 +39,7 @@ describe("Commander", () => {
         const createPusher = (array: any[], item: any) => {
             return async (command: Command, next: NextMiddleware) => {
                 await Promise.resolve(true);
-                await next();
+                await next(command);
                 array.push(item);
             }
         }

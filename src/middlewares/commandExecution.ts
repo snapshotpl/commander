@@ -11,6 +11,6 @@ export class CommandExecutionMiddleware implements Middleware {
     public async run(command: Command, next: NextMiddleware): Promise<void> {
         const handler: Handler<Command> = this.handlerResolver.resolve(command);
         await handler.handle(command);
-        await next();
+        await next(command);
     }
 }

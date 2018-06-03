@@ -41,7 +41,7 @@ export class CommandLoggerMiddleware implements Middleware {
         const timer = new Timer();
 
         try {
-            const res = await next();
+            const res = await next(command);
             this.logger.log(this.level, 'Command %s succeeded (%dms)', commandName, timer.getTime());
             return res;
         } catch (err) {

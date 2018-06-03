@@ -1,7 +1,7 @@
 
 import { Command } from '../commandBus';
 
-export type NextMiddleware = () => Promise<any>;
+export type NextMiddleware = (command: Command) => Promise<any>;
 
 export interface Middleware {
     run(command: Command, next: NextMiddleware): Promise<void>;

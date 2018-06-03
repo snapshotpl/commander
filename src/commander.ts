@@ -26,7 +26,7 @@ export class Commander implements CommandBus {
             middleware: Middleware
         ): ExecutionChain => {
             return (command: Command): Promise<void> => {
-                return middleware.run(command, () => next(command));
+                return middleware.run(command, next);
             }
         };
 
